@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+// using UnityEngine.UI;
+using TMPro;
 using System.Collections.Generic;
 
 public class GridPlacer : MonoBehaviour
@@ -13,17 +15,23 @@ public class GridPlacer : MonoBehaviour
     public TileBase validHighlightTile;
     public TileBase invalidHighlightTile;
 
-    [Header("Settings")]
-    public Vector3Int spawnCell = Vector3Int.zero;
+    [Header("UI Counters")]
+    public TextMeshProUGUI  totalRootText;      // UI Text reference (or TextMeshProUGUI)
+    public TextMeshProUGUI  rootLimitText;
 
+    [Header("Placement Settings")]
+    public Vector3Int spawnCell = Vector3Int.zero;
+    public int rootGrowthLimit = 4; // How many tiles the player can place
+
+    private int totalRootTiles = 1; // Starts with 1 (spawn tile)
     private HashSet<Vector3Int> validPositions = new HashSet<Vector3Int>();
     private Vector3Int lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
 
     void Start()
     {
-        // Place the central spawn tile
         mainTilemap.SetTile(spawnCell, placementTile);
         AddValidNeighbors(spawnCell);
+        UpdateUI();
     }
 
     void Update()
@@ -31,41 +39,37 @@ public class GridPlacer : MonoBehaviour
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cellPos = mainTilemap.WorldToCell(mouseWorldPos);
 
-        // Always show highlight at mouse position
         highlightTilemap.ClearAllTiles();
 
         if (!mainTilemap.HasTile(cellPos))
         {
             int neighborCount = CountPlacedNeighbors(cellPos);
 
-            if (validPositions.Contains(cellPos) && neighborCount == 1)
-            {
+            if (validPositions.Contains(cellPos) && neighborCount == 1 && totalRootTiles < rootGrowthLimit + 1)
                 highlightTilemap.SetTile(cellPos, validHighlightTile);
-            }
             else
-            {
                 highlightTilemap.SetTile(cellPos, invalidHighlightTile);
-            }
         }
 
-        // Handle drag-to-place
-        if (Input.GetMouseButton(0)) // Held down
+        // Handle drag placement
+        if (Input.GetMouseButton(0))
         {
             if (cellPos != lastPlacedCell && validPositions.Contains(cellPos))
             {
                 int neighborCount = CountPlacedNeighbors(cellPos);
 
-                if (neighborCount == 1)
+                if (neighborCount == 1 && totalRootTiles < rootGrowthLimit + 1)
                 {
                     mainTilemap.SetTile(cellPos, placementTile);
                     validPositions.Remove(cellPos);
                     AddValidNeighbors(cellPos);
                     lastPlacedCell = cellPos;
+                    totalRootTiles++;
+                    UpdateUI();
                 }
             }
         }
 
-        // Reset drag state
         if (Input.GetMouseButtonUp(0))
         {
             lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
@@ -114,5 +118,14 @@ public class GridPlacer : MonoBehaviour
         }
 
         return count;
+    }
+
+    void UpdateUI()
+    {
+        if (totalRootText != null)
+            totalRootText.text = "Total Root Tiles: " + totalRootTiles;
+
+        if (rootLimitText != null)
+            rootLimitText.text = "Root Growth Limit: " + rootGrowthLimit;
     }
 }
