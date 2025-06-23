@@ -4942,9 +4942,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainTilemap: {fileID: 1076481308}
   highlightTilemap: {fileID: 1755496044}
+  potatoTile: {fileID: 11400000, guid: c056a67d472744e9888f5f18e18f9659, type: 2}
   placementTile: {fileID: 11400000, guid: 5a6e74031f3fe1b41ab2d99ea761cd6f, type: 2}
   validHighlightTile: {fileID: 11400000, guid: 588e873bb7351c845b91bf107d62dd34, type: 2}
   invalidHighlightTile: {fileID: 11400000, guid: 83a3780d3037c5c4eb5b98a3de0a9fa3, type: 2}
+  rootEnd: {fileID: 11400000, guid: c75e49fab37df4f4ca94b50fe8e112f7, type: 2}
+  rootStraight: {fileID: 11400000, guid: 3055632ec3b4c44d18d02e166f4e8b8d, type: 2}
+  rootCorner: {fileID: 11400000, guid: d055100cd5f3a4cc5b941347d9d17481, type: 2}
+  rootT: {fileID: 11400000, guid: 8f80c4ab33fba461f80d40c67c0a1e8e, type: 2}
+  rootCross: {fileID: 11400000, guid: a0d294aff5fb944e6b69d75ad0552738, type: 2}
   totalRootText: {fileID: 932661995}
   rootLimitText: {fileID: 1940418375}
   spawnCell: {x: 0, y: 0, z: 0}
