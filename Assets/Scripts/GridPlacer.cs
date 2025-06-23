@@ -10,9 +10,18 @@ public class GridPlacer : MonoBehaviour
     public Tilemap highlightTilemap;    // The tilemap used for showing highlight feedback
 
     [Header("Tiles")]
+    public TileBase potatoTile;
     public TileBase placementTile;         // The tile placed by the player (root)
     public TileBase validHighlightTile;    // Highlight tile shown when placement is valid
     public TileBase invalidHighlightTile;  // Highlight tile shown when placement is invalid
+
+    [Header("Root Sprites")]
+    public TileBase rootEnd;
+    public TileBase rootStraight;
+    public TileBase rootCorner;
+    public TileBase rootT;
+    public TileBase rootCross;
+
 
     [Header("UI Counters")]
     public TextMeshProUGUI totalRootText;     // Displays total number of placed tiles
@@ -30,7 +39,9 @@ public class GridPlacer : MonoBehaviour
     void Start()
     {
         // Place the initial root tile and add its valid neighbors
-        mainTilemap.SetTile(spawnCell, placementTile);
+        mainTilemap.SetTile(spawnCell, potatoTile);
+        mainTilemap.SetTransformMatrix(spawnCell, Matrix4x4.identity);
+
         AddValidNeighbors(spawnCell);
         UpdateUI();
     }
@@ -67,7 +78,7 @@ public class GridPlacer : MonoBehaviour
                 // Allow placement only if one neighbor and still under limit
                 if (neighborCount == 1 && totalRootTiles < rootGrowthLimit + 1)
                 {
-                    mainTilemap.SetTile(cellPos, placementTile);
+                    PlaceAndRefresh(cellPos);
                     validPositions.Remove(cellPos);
                     AddValidNeighbors(cellPos);
                     lastPlacedCell = cellPos;
@@ -129,6 +140,85 @@ public class GridPlacer : MonoBehaviour
         }
 
         return count;
+    }
+
+    void PlaceAndRefresh(Vector3Int pos)
+    {
+        RefreshTile(pos);
+
+        Vector3Int[] directions = new Vector3Int[]
+        {
+            Vector3Int.up, // left
+            Vector3Int.down, // right
+            Vector3Int.left, // down
+            Vector3Int.right // up
+        };
+
+        foreach (var dir in directions)
+        {
+            Vector3Int neighbor = pos + dir;
+            if (mainTilemap.HasTile(neighbor) && neighbor != spawnCell)
+            {
+                RefreshTile(neighbor);
+            }
+        }
+    }
+
+    void RefreshTile(Vector3Int pos)
+    {
+        bool up = mainTilemap.HasTile(pos + Vector3Int.up);
+        bool down = mainTilemap.HasTile(pos + Vector3Int.down);
+        bool left = mainTilemap.HasTile(pos + Vector3Int.left);
+        bool right = mainTilemap.HasTile(pos + Vector3Int.right);
+
+        int connections = (up ? 1 : 0) + (down ? 1 : 0) + (left ? 1 : 0) + (right ? 1 : 0);
+
+        TileBase newTile = null;
+        float rotZ = 0f;
+
+        if (connections == 1)
+        {
+            newTile = rootEnd;
+            if (up) rotZ = 0;
+            else if (right) rotZ = 270;
+            else if (down) rotZ = 180;
+            else if (left) rotZ = 90;
+        }
+        else if (connections == 2)
+        {
+            if ((up && down) || (left && right))
+            {
+                newTile = rootStraight;
+                rotZ = (up && down) ? 0 : 90;
+            }
+            else
+            {
+                newTile = rootCorner;
+                if (right && down) rotZ = 0f;          
+                else if (down && left) rotZ = 270f;
+                else if (left && up) rotZ = 180f;
+                else if (up && right) rotZ = 90f;
+            }
+        }
+        else if (connections == 3)
+        {
+            newTile = rootT;
+            if (!left) rotZ = 0f;             
+            else if (!up) rotZ = 270f;
+            else if (!right) rotZ = 180f;
+            else if (!down) rotZ = 90f;
+        }
+        else if (connections == 4)
+        {
+            newTile = rootCross;
+            rotZ = 0;
+        }
+
+        if (newTile != null)
+        {
+            mainTilemap.SetTile(pos, newTile);
+            mainTilemap.SetTransformMatrix(pos, Matrix4x4.Rotate(Quaternion.Euler(0, 0, rotZ)));
+        }
     }
 
     // Updates the UI counters for tile placement
