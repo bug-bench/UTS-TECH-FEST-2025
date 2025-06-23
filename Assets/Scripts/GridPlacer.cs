@@ -4,19 +4,23 @@ using System.Collections.Generic;
 
 public class GridPlacer : MonoBehaviour
 {
+    [Header("Tilemap References")]
     public Tilemap mainTilemap;
     public Tilemap highlightTilemap;
+
+    [Header("Tiles")]
     public TileBase placementTile;
-    public TileBase highlightTile;
+    public TileBase validHighlightTile;
+    public TileBase invalidHighlightTile;
 
-    public Vector3Int spawnCell; // Set in inspector or Start()
+    [Header("Settings")]
+    public Vector3Int spawnCell = Vector3Int.zero;
+
     private HashSet<Vector3Int> validPositions = new HashSet<Vector3Int>();
-
-    private Vector3Int previousCell;
 
     void Start()
     {
-        // Place the spawn tile
+        // Place the central spawn tile
         mainTilemap.SetTile(spawnCell, placementTile);
         AddValidNeighbors(spawnCell);
     }
@@ -26,17 +30,25 @@ public class GridPlacer : MonoBehaviour
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cellPos = mainTilemap.WorldToCell(mouseWorldPos);
 
-        // Highlight only valid spots
-        if (cellPos != previousCell)
-        {
-            highlightTilemap.ClearAllTiles();
-            if (validPositions.Contains(cellPos))
-                highlightTilemap.SetTile(cellPos, highlightTile);
+        // Always show a highlight at the hovered cell
+        highlightTilemap.ClearAllTiles();
 
-            previousCell = cellPos;
+        if (mainTilemap.HasTile(cellPos) || highlightTilemap == null)
+        {
+            // Don't highlight if a tile already exists
+            return;
         }
 
-        // Place tile if allowed
+        if (validPositions.Contains(cellPos))
+        {
+            highlightTilemap.SetTile(cellPos, validHighlightTile);
+        }
+        else
+        {
+            highlightTilemap.SetTile(cellPos, invalidHighlightTile);
+        }
+
+        // Place tile only if it's in a valid spot
         if (Input.GetMouseButtonDown(0) && validPositions.Contains(cellPos))
         {
             mainTilemap.SetTile(cellPos, placementTile);
@@ -45,10 +57,10 @@ public class GridPlacer : MonoBehaviour
         }
     }
 
-    // Add neighboring cells if they're not already occupied
     void AddValidNeighbors(Vector3Int origin)
     {
-        Vector3Int[] directions = {
+        Vector3Int[] directions = new Vector3Int[]
+        {
             new Vector3Int(1, 0, 0),
             new Vector3Int(-1, 0, 0),
             new Vector3Int(0, 1, 0),

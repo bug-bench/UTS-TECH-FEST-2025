@@ -4469,7 +4469,9 @@ MonoBehaviour:
   mainTilemap: {fileID: 1076481308}
   highlightTilemap: {fileID: 1755496044}
   placementTile: {fileID: 11400000, guid: 5a6e74031f3fe1b41ab2d99ea761cd6f, type: 2}
-  highlightTile: {fileID: 11400000, guid: 1de672c12526d994c91501cb5d8d2bbd, type: 2}
+  validHighlightTile: {fileID: 11400000, guid: 588e873bb7351c845b91bf107d62dd34, type: 2}
+  invalidHighlightTile: {fileID: 11400000, guid: 83a3780d3037c5c4eb5b98a3de0a9fa3, type: 2}
+  spawnCell: {x: 0, y: 0, z: 0}
 --- !u!4 &1676157018
 Transform:
   m_ObjectHideFlags: 0
