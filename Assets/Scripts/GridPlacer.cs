@@ -28,10 +28,8 @@ public class GridPlacer : MonoBehaviour
 
     [Header("Placement Settings")]
     public Vector3Int spawnCell = Vector3Int.zero;
-    public int rootGrowthLimit = 4;
-
-    [Header("Growth Limit Settings")]
     public int defaultGrowthLimit = 6;
+    public int rootGrowthLimit;
 
     [Header("Checkpoint")]
     public Transform playerTransform;
@@ -41,17 +39,19 @@ public class GridPlacer : MonoBehaviour
     private bool hasCollectedCheckpoint = false;
     private Dictionary<Vector3Int, (TileBase tile, Matrix4x4 matrix)> checkpointTiles = new Dictionary<Vector3Int, (TileBase, Matrix4x4)>();
     private int checkpointRootTileCount = 1;
-    private int checkpointGrowthLimit = 4;
+    private int checkpointGrowthLimit = 6;
 
     [Header("External Systems")]
     public NutrientChecker nutrientChecker;
 
     private int totalRootTiles = 1;
+    private int currentGrowthCount = 0;
     private HashSet<Vector3Int> validPositions = new HashSet<Vector3Int>();
     private Vector3Int lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
 
     void Start()
     {
+        rootGrowthLimit = defaultGrowthLimit;
         mainTilemap.SetTile(spawnCell, potatoTile);
         mainTilemap.SetTransformMatrix(spawnCell, Matrix4x4.identity);
         AddValidNeighbors(spawnCell);
@@ -64,15 +64,12 @@ public class GridPlacer : MonoBehaviour
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cellPos = mainTilemap.WorldToCell(mouseWorldPos);
 
-        rootGrowthLimit = defaultGrowthLimit;
-        checkpointGrowthLimit = defaultGrowthLimit;
-
         highlightTilemap.ClearAllTiles();
 
-        if (!mainTilemap.HasTile(cellPos))
+        if (!mainTilemap.HasTile(cellPos) && !WallChecker.Instance.IsWall(cellPos))
         {
             int neighborCount = CountPlacedNeighbors(cellPos);
-            if (validPositions.Contains(cellPos) && neighborCount == 1 && totalRootTiles < rootGrowthLimit + 1)
+            if (validPositions.Contains(cellPos) && neighborCount == 1 && currentGrowthCount < rootGrowthLimit)
                 highlightTilemap.SetTile(cellPos, validHighlightTile);
             else
                 highlightTilemap.SetTile(cellPos, invalidHighlightTile);
@@ -80,16 +77,17 @@ public class GridPlacer : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
-            if (cellPos != lastPlacedCell && validPositions.Contains(cellPos))
+            if (cellPos != lastPlacedCell && validPositions.Contains(cellPos) && !WallChecker.Instance.IsWall(cellPos))
             {
                 int neighborCount = CountPlacedNeighbors(cellPos);
-                if (neighborCount == 1 && totalRootTiles < rootGrowthLimit + 1)
+                if (neighborCount == 1 && currentGrowthCount < rootGrowthLimit)
                 {
                     PlaceAndRefresh(cellPos);
                     validPositions.Remove(cellPos);
                     AddValidNeighbors(cellPos);
                     lastPlacedCell = cellPos;
                     totalRootTiles++;
+                    currentGrowthCount++;
                     UpdateUI();
                     nutrientChecker.CheckForNutrients(cellPos);
                 }
@@ -108,9 +106,8 @@ public class GridPlacer : MonoBehaviour
                     mainTilemap.SetTransformMatrix(pair.Key, pair.Value.matrix);
                 }
 
-                totalRootTiles = checkpointRootTileCount;
+                currentGrowthCount = 0;
                 rootGrowthLimit = checkpointGrowthLimit;
-
                 cameraController?.SnapToPosition(lastCheckpointPosition);
 
                 validPositions.Clear();
@@ -129,8 +126,8 @@ public class GridPlacer : MonoBehaviour
                 validPositions.Clear();
                 AddValidNeighbors(spawnCell);
 
-                totalRootTiles = 1;
-                rootGrowthLimit = 4;
+                currentGrowthCount = 0;
+                rootGrowthLimit = defaultGrowthLimit;
             }
 
             UpdateUI();
@@ -264,12 +261,12 @@ public class GridPlacer : MonoBehaviour
             totalRootText.text = "Total Root Tiles: " + totalRootTiles;
 
         if (rootLimitText != null)
-            rootLimitText.text = "Root Growth Limit: " + rootGrowthLimit;
+            rootLimitText.text = $"Growth Used: {currentGrowthCount} / {rootGrowthLimit}";
     }
 
     public void ResetRoots()
     {
-        totalRootTiles = 1;
+        currentGrowthCount = 0;
         UpdateUI();
     }
 
