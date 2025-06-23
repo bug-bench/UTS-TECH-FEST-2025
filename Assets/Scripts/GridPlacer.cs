@@ -6,14 +6,14 @@ using System.Collections.Generic;
 public class GridPlacer : MonoBehaviour
 {
     [Header("Tilemap References")]
-    public Tilemap mainTilemap;         // The tilemap where root tiles are placed
-    public Tilemap highlightTilemap;    // The tilemap used for showing highlight feedback
+    public Tilemap mainTilemap;
+    public Tilemap highlightTilemap;
 
     [Header("Tiles")]
     public TileBase potatoTile;
-    public TileBase placementTile;         // The tile placed by the player (root)
-    public TileBase validHighlightTile;    // Highlight tile shown when placement is valid
-    public TileBase invalidHighlightTile;  // Highlight tile shown when placement is invalid
+    public TileBase placementTile;
+    public TileBase validHighlightTile;
+    public TileBase invalidHighlightTile;
 
     [Header("Root Sprites")]
     public TileBase rootEnd;
@@ -22,74 +22,61 @@ public class GridPlacer : MonoBehaviour
     public TileBase rootT;
     public TileBase rootCross;
 
-
     [Header("UI Counters")]
-    public TextMeshProUGUI totalRootText;     // Displays total number of placed tiles
-    public TextMeshProUGUI rootLimitText;     // Displays max number of allowed placements
+    public TextMeshProUGUI totalRootText;
+    public TextMeshProUGUI rootLimitText;
 
     [Header("Placement Settings")]
-    public Vector3Int spawnCell = Vector3Int.zero;  // Starting point of the root system
-    public int rootGrowthLimit = 4;                 // Max number of tiles player can grow
+    public Vector3Int spawnCell = Vector3Int.zero;
+    public int rootGrowthLimit = 4;
 
     [Header("Checkpoint")]
-    public Transform playerTransform;         // Assign your player object here
-    public CameraController cameraController; // Assign the camera controller script
-    public Vector3 spawnPoint = Vector3.zero; // Potato center
+    public Transform playerTransform;
+    public CameraController cameraController;
+    public Vector3 spawnPoint = Vector3.zero;
     private Vector3 lastCheckpointPosition;
     private bool hasCollectedCheckpoint = false;
-    private Dictionary<Vector3Int, TileBase> checkpointTiles = new Dictionary<Vector3Int, TileBase>();
-
+    private Dictionary<Vector3Int, (TileBase tile, Matrix4x4 matrix)> checkpointTiles = new Dictionary<Vector3Int, (TileBase, Matrix4x4)>();
+    private int checkpointRootTileCount = 1;
+    private int checkpointGrowthLimit = 4;
 
     [Header("External Systems")]
     public NutrientChecker nutrientChecker;
 
-    // Internal tracking variables
-    private int totalRootTiles = 1; // Starts at 1 because we place the spawn tile immediately
-    private HashSet<Vector3Int> validPositions = new HashSet<Vector3Int>(); // Positions eligible for placement
-    private Vector3Int lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue); // Tracks last placed tile to avoid drag-spam
+    private int totalRootTiles = 1;
+    private HashSet<Vector3Int> validPositions = new HashSet<Vector3Int>();
+    private Vector3Int lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
 
     void Start()
     {
-        // Place the initial root tile and add its valid neighbors
         mainTilemap.SetTile(spawnCell, potatoTile);
         mainTilemap.SetTransformMatrix(spawnCell, Matrix4x4.identity);
-
         AddValidNeighbors(spawnCell);
         UpdateUI();
-
         lastCheckpointPosition = spawnPoint;
     }
 
     void Update()
     {
-        // Convert mouse position to grid cell
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cellPos = mainTilemap.WorldToCell(mouseWorldPos);
 
-        // Always clear highlight tiles before updating
         highlightTilemap.ClearAllTiles();
 
-        // Only show highlight if the cell doesn't already have a tile
         if (!mainTilemap.HasTile(cellPos))
         {
             int neighborCount = CountPlacedNeighbors(cellPos);
-
-            // Show valid highlight if position is allowed and only connects to one tile (Scrabble rule)
             if (validPositions.Contains(cellPos) && neighborCount == 1 && totalRootTiles < rootGrowthLimit + 1)
                 highlightTilemap.SetTile(cellPos, validHighlightTile);
             else
                 highlightTilemap.SetTile(cellPos, invalidHighlightTile);
         }
 
-        // Handle drag placement when mouse is held down
         if (Input.GetMouseButton(0))
         {
-            // Only place if cell is different from last and is valid
             if (cellPos != lastPlacedCell && validPositions.Contains(cellPos))
             {
                 int neighborCount = CountPlacedNeighbors(cellPos);
-
-                // Allow placement only if one neighbor and still under limit
                 if (neighborCount == 1 && totalRootTiles < rootGrowthLimit + 1)
                 {
                     PlaceAndRefresh(cellPos);
@@ -98,47 +85,52 @@ public class GridPlacer : MonoBehaviour
                     lastPlacedCell = cellPos;
                     totalRootTiles++;
                     UpdateUI();
-
                     nutrientChecker.CheckForNutrients(cellPos);
                 }
             }
         }
 
-        // Reset drag placement when mouse is released
         if (Input.GetKeyDown(KeyCode.R))
         {
-            // Clear all placed tiles
             mainTilemap.ClearAllTiles();
 
             if (hasCollectedCheckpoint)
             {
-                // Restore checkpoint tiles
                 foreach (var pair in checkpointTiles)
                 {
-                    mainTilemap.SetTile(pair.Key, pair.Value);
+                    mainTilemap.SetTile(pair.Key, pair.Value.tile);
+                    mainTilemap.SetTransformMatrix(pair.Key, pair.Value.matrix);
                 }
 
-                if (cameraController != null)
-                    cameraController.SnapToPosition(lastCheckpointPosition);
+                totalRootTiles = checkpointRootTileCount;
+                rootGrowthLimit = checkpointGrowthLimit;
+
+                cameraController?.SnapToPosition(lastCheckpointPosition);
+
+                validPositions.Clear();
+                foreach (var pair in checkpointTiles)
+                {
+                    AddValidNeighbors(pair.Key);
+                }
             }
             else
             {
-                // No checkpoint: place initial spawn tile again
-                mainTilemap.SetTile(spawnCell, placementTile);
+                mainTilemap.SetTile(spawnCell, potatoTile);
+                mainTilemap.SetTransformMatrix(spawnCell, Matrix4x4.identity);
 
-                if (cameraController != null)
-                    cameraController.SnapToPosition(spawnPoint);
+                cameraController?.SnapToPosition(spawnPoint);
+
+                validPositions.Clear();
+                AddValidNeighbors(spawnCell);
+
+                totalRootTiles = 1;
+                rootGrowthLimit = 4;
             }
 
-            // Reset placement state
-            validPositions.Clear();
-            AddValidNeighbors(spawnCell);
-            totalRootTiles = hasCollectedCheckpoint ? checkpointTiles.Count : 1;
             UpdateUI();
         }
     }
 
-    // Adds all valid adjacent cells to a given tile (up/down/left/right)
     void AddValidNeighbors(Vector3Int origin)
     {
         Vector3Int[] directions = new Vector3Int[]
@@ -152,8 +144,6 @@ public class GridPlacer : MonoBehaviour
         foreach (Vector3Int dir in directions)
         {
             Vector3Int neighbor = origin + dir;
-
-            // Only add neighbors that aren't already occupied or already marked valid
             if (!mainTilemap.HasTile(neighbor) && !validPositions.Contains(neighbor))
             {
                 validPositions.Add(neighbor);
@@ -161,7 +151,6 @@ public class GridPlacer : MonoBehaviour
         }
     }
 
-    // Counts how many neighboring tiles are already placed around a given cell
     int CountPlacedNeighbors(Vector3Int cellPos)
     {
         int count = 0;
@@ -181,7 +170,6 @@ public class GridPlacer : MonoBehaviour
                 count++;
             }
         }
-
         return count;
     }
 
@@ -191,10 +179,10 @@ public class GridPlacer : MonoBehaviour
 
         Vector3Int[] directions = new Vector3Int[]
         {
-            Vector3Int.up, // left
-            Vector3Int.down, // right
-            Vector3Int.left, // down
-            Vector3Int.right // up
+            Vector3Int.up,
+            Vector3Int.down,
+            Vector3Int.left,
+            Vector3Int.right
         };
 
         foreach (var dir in directions)
@@ -264,7 +252,6 @@ public class GridPlacer : MonoBehaviour
         }
     }
 
-    // Updates the UI counters for tile placement
     void UpdateUI()
     {
         if (totalRootText != null)
@@ -279,23 +266,25 @@ public class GridPlacer : MonoBehaviour
         totalRootTiles = 1;
         UpdateUI();
     }
-    
+
     public void SetCheckpoint(Vector3 worldPosition)
     {
         hasCollectedCheckpoint = true;
         lastCheckpointPosition = worldPosition;
 
-        // Save current tilemap state
         checkpointTiles.Clear();
-
         BoundsInt bounds = mainTilemap.cellBounds;
         foreach (Vector3Int pos in bounds.allPositionsWithin)
         {
             if (mainTilemap.HasTile(pos))
             {
-                checkpointTiles[pos] = mainTilemap.GetTile(pos);
+                TileBase tile = mainTilemap.GetTile(pos);
+                Matrix4x4 matrix = mainTilemap.GetTransformMatrix(pos);
+                checkpointTiles[pos] = (tile, matrix);
             }
         }
-    }
 
+        checkpointRootTileCount = totalRootTiles;
+        checkpointGrowthLimit = rootGrowthLimit;
+    }
 }
