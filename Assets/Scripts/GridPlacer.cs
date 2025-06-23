@@ -194,19 +194,19 @@ public class GridPlacer : MonoBehaviour
             else
             {
                 newTile = rootCorner;
-                if (up && right) rotZ = 0;
-                else if (right && down) rotZ = 0;
-                else if (down && left) rotZ = 0;
-                else if (up && left) rotZ = 180;
+                if (right && down) rotZ = 0f;          
+                else if (down && left) rotZ = 270f;
+                else if (left && up) rotZ = 180f;
+                else if (up && right) rotZ = 90f;
             }
         }
         else if (connections == 3)
         {
             newTile = rootT;
-            if (!up) rotZ = 180;
-            else if (!right) rotZ = 90;
-            else if (!down) rotZ = 0;
-            else if (!left) rotZ = 270;
+            if (!left) rotZ = 0f;             
+            else if (!up) rotZ = 270f;
+            else if (!right) rotZ = 180f;
+            else if (!down) rotZ = 90f;
         }
         else if (connections == 4)
         {
