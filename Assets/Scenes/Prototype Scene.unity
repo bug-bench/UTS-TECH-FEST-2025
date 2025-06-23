@@ -4798,7 +4798,7 @@ MonoBehaviour:
   totalRootText: {fileID: 932661995}
   rootLimitText: {fileID: 1940418375}
   spawnCell: {x: 0, y: 0, z: 0}
-  rootGrowthLimit: 4
+  rootGrowthLimit: 999
 --- !u!4 &1676157018
 Transform:
   m_ObjectHideFlags: 0
