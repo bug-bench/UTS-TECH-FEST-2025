@@ -2,9 +2,12 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
 
 public class GridPlacer : MonoBehaviour
 {
+    private List<Vector3Int> placedRootOrder = new List<Vector3Int>();
+
     [Header("Tilemap References")]
     public Tilemap mainTilemap;
     public Tilemap highlightTilemap;
@@ -88,8 +91,13 @@ public class GridPlacer : MonoBehaviour
                     lastPlacedCell = cellPos;
                     totalRootTiles++;
                     currentGrowthCount++;
+                    placedRootOrder.Add(cellPos); // track the root
                     UpdateUI();
                     nutrientChecker.CheckForNutrients(cellPos);
+                }
+                if (HazardChecker.Instance.IsPoison(cellPos))
+                {
+                    StartCoroutine(DestroyPoisonedRoot(cellPos));
                 }
             }
         }
@@ -295,6 +303,40 @@ public class GridPlacer : MonoBehaviour
     {
         rootGrowthLimit = newLimit;
         checkpointGrowthLimit = newLimit;
+        UpdateUI();
+    }
+
+    private IEnumerator DestroyPoisonedRoot(Vector3Int poisonedCell)
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        // ✅ Consume poison hazard
+        HazardChecker.Instance.RemovePoison(poisonedCell);
+
+        // Destroy poisoned root tile
+        if (mainTilemap.HasTile(poisonedCell))
+        {
+            mainTilemap.SetTile(poisonedCell, null);
+            totalRootTiles--;
+            placedRootOrder.Remove(poisonedCell);
+            validPositions.Add(poisonedCell);
+            AddValidNeighbors(poisonedCell);
+        }
+
+        // Destroy the previous root tile (if it exists)
+        if (placedRootOrder.Count > 0)
+        {
+            Vector3Int last = placedRootOrder[^1];
+            if (mainTilemap.HasTile(last))
+            {
+                mainTilemap.SetTile(last, null);
+                totalRootTiles--;
+                placedRootOrder.RemoveAt(placedRootOrder.Count - 1);
+                validPositions.Add(last);
+                AddValidNeighbors(last);
+            }
+        }
+
         UpdateUI();
     }
 }
