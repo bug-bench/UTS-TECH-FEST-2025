@@ -161,8 +161,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1755496042}
   - {fileID: 1076481306}
+  - {fileID: 1755496042}
   - {fileID: 888734107}
   - {fileID: 676817129}
   m_Father: {fileID: 0}
@@ -366,7 +366,7 @@ MonoBehaviour:
   panSpeed: 10
   panLimitMin: {x: -20, y: -20}
   panLimitMax: {x: 20, y: 20}
-  zoomSpeed: 10
+  zoomSpeed: 15
   minZoom: 3
   maxZoom: 20
   centerTarget: {x: 0, y: 0, z: 0}
@@ -4974,7 +4974,11 @@ MonoBehaviour:
   totalRootText: {fileID: 932661995}
   rootLimitText: {fileID: 1940418375}
   spawnCell: {x: 0, y: 0, z: 0}
-  rootGrowthLimit: 4
+  rootGrowthLimit: 6
+  defaultGrowthLimit: 6
+  playerTransform: {fileID: 0}
+  cameraController: {fileID: 519420033}
+  spawnPoint: {x: 0, y: 0, z: 0}
   nutrientChecker: {fileID: 1676157019}
 --- !u!4 &1676157018
 Transform:
