@@ -17,6 +17,7 @@ public class GridPlacer : MonoBehaviour
     public Vector3Int spawnCell = Vector3Int.zero;
 
     private HashSet<Vector3Int> validPositions = new HashSet<Vector3Int>();
+    private Vector3Int lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
 
     void Start()
     {
@@ -47,17 +48,27 @@ public class GridPlacer : MonoBehaviour
             }
         }
 
-        // Place tile only if it's in a valid position and has exactly one neighbor
-        if (Input.GetMouseButtonDown(0) && validPositions.Contains(cellPos))
+        // Handle drag-to-place
+        if (Input.GetMouseButton(0)) // Held down
         {
-            int neighborCount = CountPlacedNeighbors(cellPos);
-
-            if (neighborCount == 1)
+            if (cellPos != lastPlacedCell && validPositions.Contains(cellPos))
             {
-                mainTilemap.SetTile(cellPos, placementTile);
-                validPositions.Remove(cellPos);
-                AddValidNeighbors(cellPos);
+                int neighborCount = CountPlacedNeighbors(cellPos);
+
+                if (neighborCount == 1)
+                {
+                    mainTilemap.SetTile(cellPos, placementTile);
+                    validPositions.Remove(cellPos);
+                    AddValidNeighbors(cellPos);
+                    lastPlacedCell = cellPos;
+                }
             }
+        }
+
+        // Reset drag state
+        if (Input.GetMouseButtonUp(0))
+        {
+            lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
         }
     }
 
