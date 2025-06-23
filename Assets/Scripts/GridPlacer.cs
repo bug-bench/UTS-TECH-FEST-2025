@@ -30,6 +30,9 @@ public class GridPlacer : MonoBehaviour
     public Vector3Int spawnCell = Vector3Int.zero;
     public int rootGrowthLimit = 4;
 
+    [Header("Growth Limit Settings")]
+    public int defaultGrowthLimit = 6;
+
     [Header("Checkpoint")]
     public Transform playerTransform;
     public CameraController cameraController;
@@ -60,6 +63,9 @@ public class GridPlacer : MonoBehaviour
     {
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cellPos = mainTilemap.WorldToCell(mouseWorldPos);
+
+        rootGrowthLimit = defaultGrowthLimit;
+        checkpointGrowthLimit = defaultGrowthLimit;
 
         highlightTilemap.ClearAllTiles();
 
@@ -286,5 +292,12 @@ public class GridPlacer : MonoBehaviour
 
         checkpointRootTileCount = totalRootTiles;
         checkpointGrowthLimit = rootGrowthLimit;
+    }
+
+    public void UpdateGrowthLimit(int newLimit)
+    {
+        rootGrowthLimit = newLimit;
+        checkpointGrowthLimit = newLimit;
+        UpdateUI();
     }
 }

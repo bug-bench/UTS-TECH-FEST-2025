@@ -21,4 +21,10 @@ public class NutrientChecker : MonoBehaviour
             Destroy(hit.gameObject);
         }
     }
+
+    public void ApplyNutrientGrowth(int growthValue)
+    {
+        gridPlacer.UpdateGrowthLimit(growthValue);
+    }
+
 }

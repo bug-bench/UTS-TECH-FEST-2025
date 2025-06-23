@@ -4974,7 +4974,8 @@ MonoBehaviour:
   totalRootText: {fileID: 932661995}
   rootLimitText: {fileID: 1940418375}
   spawnCell: {x: 0, y: 0, z: 0}
-  rootGrowthLimit: 4
+  rootGrowthLimit: 6
+  defaultGrowthLimit: 6
   playerTransform: {fileID: 0}
   cameraController: {fileID: 519420033}
   spawnPoint: {x: 0, y: 0, z: 0}
