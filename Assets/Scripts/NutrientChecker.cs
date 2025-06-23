@@ -3,34 +3,23 @@ using UnityEngine.Tilemaps;
 
 public class NutrientChecker : MonoBehaviour
 {
-    public Tilemap tilemap;
-    public GridPlacer gridPlacer;
+    public Tilemap tilemap;           // This should be your placement tilemap (mainTilemap)
+    public GridPlacer gridPlacer;     // Link to GridPlacer to reset root counter
 
-    public void CheckForNutrients(Vector3Int cellPos)
+    public void CheckForNutrients(Vector3Int placedCell)
     {
-        Vector3Int[] directions = new Vector3Int[]
+        // Convert cell to center-world position
+        Vector3 worldPos = tilemap.CellToWorld(placedCell) + new Vector3(0.5f, 0.5f, 0f);
+
+        // Check for nutrient object at this tile's center
+        Collider2D hit = Physics2D.OverlapPoint(worldPos);
+        if (hit != null && hit.CompareTag("Nutrients"))
         {
-            new Vector3Int(1, 0, 0),
-            new Vector3Int(-1, 0, 0),
-            new Vector3Int(0, 1, 0),
-            new Vector3Int(0, -1, 0)
-        };
+            Debug.Log("Nutrient collected directly at " + placedCell);
+            gridPlacer.ResetRoots();
 
-        foreach (Vector3Int dir in directions)
-        {
-            Vector3Int checkCell = cellPos + dir;
-            Vector3 worldPos = tilemap.CellToWorld(checkCell) + new Vector3(0.5f, 0.5f, 0);
-
-            Collider2D hit = Physics2D.OverlapPoint(worldPos);
-            if (hit != null && hit.CompareTag("Nutrients"))
-            {
-                Debug.Log("Nutrient found at " + worldPos);
-                gridPlacer.ResetRoots();
-
-                // Optional: disable or destroy the nutrient
-                Destroy(hit.gameObject);
-                return;
-            }
+            // Optional: remove the nutrient object so it can’t be reused
+            Destroy(hit.gameObject);
         }
     }
 }
