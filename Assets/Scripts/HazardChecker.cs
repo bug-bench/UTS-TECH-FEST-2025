@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class HazardChecker : MonoBehaviour
 {
-    public Tilemap poisonTilemap;  // Assign the poison tilemap in inspector
+    public Tilemap poisonTilemap;  // Drag PoisonGrid here
 
     private HashSet<Vector3Int> poisonPositions = new HashSet<Vector3Int>();
 
@@ -18,12 +18,16 @@ public class HazardChecker : MonoBehaviour
             return;
         }
         Instance = this;
+    }
 
+    void Start()
+    {
         CachePoisonPositions();
     }
 
     void CachePoisonPositions()
     {
+        poisonPositions.Clear(); // Clear any old data in case this runs again
         BoundsInt bounds = poisonTilemap.cellBounds;
         foreach (Vector3Int pos in bounds.allPositionsWithin)
         {
@@ -37,5 +41,11 @@ public class HazardChecker : MonoBehaviour
     public bool IsPoison(Vector3Int cellPos)
     {
         return poisonPositions.Contains(cellPos);
+    }
+
+    public void RemovePoison(Vector3Int cellPos)
+    {
+        poisonPositions.Remove(cellPos);
+        poisonTilemap.SetTile(cellPos, null); // This is safe even if already removed
     }
 }

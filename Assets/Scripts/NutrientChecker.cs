@@ -3,8 +3,8 @@ using UnityEngine.Tilemaps;
 
 public class NutrientChecker : MonoBehaviour
 {
-    public Tilemap tilemap;           // This should be your placement tilemap (mainTilemap)
-    public GridPlacer gridPlacer;     // Link to GridPlacer to reset root counter
+    public Tilemap tilemap; // This should be your placement tilemap (mainTilemap)
+    public GridPlacer gridPlacer; // Link to GridPlacer to reset root counter
 
     public void CheckForNutrients(Vector3Int placedCell)
     {

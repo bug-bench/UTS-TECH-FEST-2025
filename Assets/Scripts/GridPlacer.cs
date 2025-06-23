@@ -95,10 +95,10 @@ public class GridPlacer : MonoBehaviour
                     UpdateUI();
                     nutrientChecker.CheckForNutrients(cellPos);
                 }
-                    if (HazardChecker.Instance.IsPoison(cellPos))
-                    {
-                        StartCoroutine(DestroyPoisonedRoot(cellPos));
-                    }
+                if (HazardChecker.Instance.IsPoison(cellPos))
+                {
+                    StartCoroutine(DestroyPoisonedRoot(cellPos));
+                }
             }
         }
 
@@ -308,23 +308,33 @@ public class GridPlacer : MonoBehaviour
 
     private IEnumerator DestroyPoisonedRoot(Vector3Int poisonedCell)
     {
-        yield return new WaitForSeconds(1.5f); // delay before destruction
+        yield return new WaitForSeconds(1.5f);
 
-        // Remove current poisoned tile
+        // ✅ Consume poison hazard
+        HazardChecker.Instance.RemovePoison(poisonedCell);
+
+        // Destroy poisoned root tile
         if (mainTilemap.HasTile(poisonedCell))
         {
             mainTilemap.SetTile(poisonedCell, null);
             totalRootTiles--;
             placedRootOrder.Remove(poisonedCell);
+            validPositions.Add(poisonedCell);
+            AddValidNeighbors(poisonedCell);
         }
 
-        // Remove the root placed before it
+        // Destroy the previous root tile (if it exists)
         if (placedRootOrder.Count > 0)
         {
-            Vector3Int last = placedRootOrder[placedRootOrder.Count - 1];
-            mainTilemap.SetTile(last, null);
-            totalRootTiles--;
-            placedRootOrder.RemoveAt(placedRootOrder.Count - 1);
+            Vector3Int last = placedRootOrder[^1];
+            if (mainTilemap.HasTile(last))
+            {
+                mainTilemap.SetTile(last, null);
+                totalRootTiles--;
+                placedRootOrder.RemoveAt(placedRootOrder.Count - 1);
+                validPositions.Add(last);
+                AddValidNeighbors(last);
+            }
         }
 
         UpdateUI();
