@@ -31,6 +31,15 @@ public class GridPlacer : MonoBehaviour
     public Vector3Int spawnCell = Vector3Int.zero;  // Starting point of the root system
     public int rootGrowthLimit = 4;                 // Max number of tiles player can grow
 
+    [Header("Checkpoint")]
+    public Transform playerTransform;         // Assign your player object here
+    public CameraController cameraController; // Assign the camera controller script
+    public Vector3 spawnPoint = Vector3.zero; // Potato center
+    private Vector3 lastCheckpointPosition;
+    private bool hasCollectedCheckpoint = false;
+    private Dictionary<Vector3Int, TileBase> checkpointTiles = new Dictionary<Vector3Int, TileBase>();
+
+
     [Header("External Systems")]
     public NutrientChecker nutrientChecker;
 
@@ -47,6 +56,8 @@ public class GridPlacer : MonoBehaviour
 
         AddValidNeighbors(spawnCell);
         UpdateUI();
+
+        lastCheckpointPosition = spawnPoint;
     }
 
     void Update()
@@ -94,9 +105,36 @@ public class GridPlacer : MonoBehaviour
         }
 
         // Reset drag placement when mouse is released
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetKeyDown(KeyCode.R))
         {
-            lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
+            // Clear all placed tiles
+            mainTilemap.ClearAllTiles();
+
+            if (hasCollectedCheckpoint)
+            {
+                // Restore checkpoint tiles
+                foreach (var pair in checkpointTiles)
+                {
+                    mainTilemap.SetTile(pair.Key, pair.Value);
+                }
+
+                if (cameraController != null)
+                    cameraController.SnapToPosition(lastCheckpointPosition);
+            }
+            else
+            {
+                // No checkpoint: place initial spawn tile again
+                mainTilemap.SetTile(spawnCell, placementTile);
+
+                if (cameraController != null)
+                    cameraController.SnapToPosition(spawnPoint);
+            }
+
+            // Reset placement state
+            validPositions.Clear();
+            AddValidNeighbors(spawnCell);
+            totalRootTiles = hasCollectedCheckpoint ? checkpointTiles.Count : 1;
+            UpdateUI();
         }
     }
 
@@ -235,10 +273,29 @@ public class GridPlacer : MonoBehaviour
         if (rootLimitText != null)
             rootLimitText.text = "Root Growth Limit: " + rootGrowthLimit;
     }
-    
+
     public void ResetRoots()
-{
-    totalRootTiles = 1;
-    UpdateUI();
-}
+    {
+        totalRootTiles = 1;
+        UpdateUI();
+    }
+    
+    public void SetCheckpoint(Vector3 worldPosition)
+    {
+        hasCollectedCheckpoint = true;
+        lastCheckpointPosition = worldPosition;
+
+        // Save current tilemap state
+        checkpointTiles.Clear();
+
+        BoundsInt bounds = mainTilemap.cellBounds;
+        foreach (Vector3Int pos in bounds.allPositionsWithin)
+        {
+            if (mainTilemap.HasTile(pos))
+            {
+                checkpointTiles[pos] = mainTilemap.GetTile(pos);
+            }
+        }
+    }
+
 }

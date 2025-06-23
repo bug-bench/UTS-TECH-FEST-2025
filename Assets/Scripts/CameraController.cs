@@ -97,4 +97,10 @@ public class CameraController : MonoBehaviour
             transform.position = new Vector3(centerTarget.x, centerTarget.y, transform.position.z);
         }
     }
+
+    public void SnapToPosition(Vector3 position)
+    {
+        transform.position = new Vector3(position.x, position.y, transform.position.z);
+    }
+
 }

@@ -17,8 +17,7 @@ public class NutrientChecker : MonoBehaviour
         {
             Debug.Log("Nutrient collected directly at " + placedCell);
             gridPlacer.ResetRoots();
-
-            // Optional: remove the nutrient object so it can’t be reused
+            gridPlacer.SetCheckpoint(tilemap.CellToWorld(placedCell) + new Vector3(0.5f, 0.5f, 0f));
             Destroy(hit.gameObject);
         }
     }
