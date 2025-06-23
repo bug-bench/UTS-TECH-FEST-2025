@@ -2,9 +2,12 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
 
 public class GridPlacer : MonoBehaviour
 {
+    private List<Vector3Int> placedRootOrder = new List<Vector3Int>();
+
     [Header("Tilemap References")]
     public Tilemap mainTilemap;
     public Tilemap highlightTilemap;
@@ -88,9 +91,14 @@ public class GridPlacer : MonoBehaviour
                     lastPlacedCell = cellPos;
                     totalRootTiles++;
                     currentGrowthCount++;
+                    placedRootOrder.Add(cellPos); // track the root
                     UpdateUI();
                     nutrientChecker.CheckForNutrients(cellPos);
                 }
+                    if (HazardChecker.Instance.IsPoison(cellPos))
+                    {
+                        StartCoroutine(DestroyPoisonedRoot(cellPos));
+                    }
             }
         }
 
@@ -295,6 +303,30 @@ public class GridPlacer : MonoBehaviour
     {
         rootGrowthLimit = newLimit;
         checkpointGrowthLimit = newLimit;
+        UpdateUI();
+    }
+
+    private IEnumerator DestroyPoisonedRoot(Vector3Int poisonedCell)
+    {
+        yield return new WaitForSeconds(1.5f); // delay before destruction
+
+        // Remove current poisoned tile
+        if (mainTilemap.HasTile(poisonedCell))
+        {
+            mainTilemap.SetTile(poisonedCell, null);
+            totalRootTiles--;
+            placedRootOrder.Remove(poisonedCell);
+        }
+
+        // Remove the root placed before it
+        if (placedRootOrder.Count > 0)
+        {
+            Vector3Int last = placedRootOrder[placedRootOrder.Count - 1];
+            mainTilemap.SetTile(last, null);
+            totalRootTiles--;
+            placedRootOrder.RemoveAt(placedRootOrder.Count - 1);
+        }
+
         UpdateUI();
     }
 }
