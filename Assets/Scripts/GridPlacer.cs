@@ -30,30 +30,34 @@ public class GridPlacer : MonoBehaviour
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cellPos = mainTilemap.WorldToCell(mouseWorldPos);
 
-        // Always show a highlight at the hovered cell
+        // Always show highlight at mouse position
         highlightTilemap.ClearAllTiles();
 
-        if (mainTilemap.HasTile(cellPos) || highlightTilemap == null)
+        if (!mainTilemap.HasTile(cellPos))
         {
-            // Don't highlight if a tile already exists
-            return;
+            int neighborCount = CountPlacedNeighbors(cellPos);
+
+            if (validPositions.Contains(cellPos) && neighborCount == 1)
+            {
+                highlightTilemap.SetTile(cellPos, validHighlightTile);
+            }
+            else
+            {
+                highlightTilemap.SetTile(cellPos, invalidHighlightTile);
+            }
         }
 
-        if (validPositions.Contains(cellPos))
-        {
-            highlightTilemap.SetTile(cellPos, validHighlightTile);
-        }
-        else
-        {
-            highlightTilemap.SetTile(cellPos, invalidHighlightTile);
-        }
-
-        // Place tile only if it's in a valid spot
+        // Place tile only if it's in a valid position and has exactly one neighbor
         if (Input.GetMouseButtonDown(0) && validPositions.Contains(cellPos))
         {
-            mainTilemap.SetTile(cellPos, placementTile);
-            validPositions.Remove(cellPos);
-            AddValidNeighbors(cellPos);
+            int neighborCount = CountPlacedNeighbors(cellPos);
+
+            if (neighborCount == 1)
+            {
+                mainTilemap.SetTile(cellPos, placementTile);
+                validPositions.Remove(cellPos);
+                AddValidNeighbors(cellPos);
+            }
         }
     }
 
@@ -76,5 +80,28 @@ public class GridPlacer : MonoBehaviour
                 validPositions.Add(neighbor);
             }
         }
+    }
+
+    int CountPlacedNeighbors(Vector3Int cellPos)
+    {
+        int count = 0;
+        Vector3Int[] directions = new Vector3Int[]
+        {
+            new Vector3Int(1, 0, 0),
+            new Vector3Int(-1, 0, 0),
+            new Vector3Int(0, 1, 0),
+            new Vector3Int(0, -1, 0)
+        };
+
+        foreach (Vector3Int dir in directions)
+        {
+            Vector3Int neighbor = cellPos + dir;
+            if (mainTilemap.HasTile(neighbor))
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 }
