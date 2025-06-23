@@ -15,18 +15,15 @@ public class GridPlacer : MonoBehaviour
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cellPos = mainTilemap.WorldToCell(mouseWorldPos);
 
-        // Highlight
+        // Update highlight
         if (cellPos != previousCellPos)
         {
             highlightTilemap.ClearAllTiles();
-            if (mainTilemap.HasTile(cellPos)) // Optional: Only highlight over existing tiles
-            {
-                highlightTilemap.SetTile(cellPos, highlightTile);
-            }
+            highlightTilemap.SetTile(cellPos, highlightTile);
             previousCellPos = cellPos;
         }
 
-        // Place tile on left click
+        // Place tile with left click
         if (Input.GetMouseButtonDown(0))
         {
             mainTilemap.SetTile(cellPos, placementTile);
