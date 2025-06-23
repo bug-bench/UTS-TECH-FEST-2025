@@ -1,34 +1,35 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
-// using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
 public class GridPlacer : MonoBehaviour
 {
     [Header("Tilemap References")]
-    public Tilemap mainTilemap;
-    public Tilemap highlightTilemap;
+    public Tilemap mainTilemap;         // The tilemap where root tiles are placed
+    public Tilemap highlightTilemap;    // The tilemap used for showing highlight feedback
 
     [Header("Tiles")]
-    public TileBase placementTile;
-    public TileBase validHighlightTile;
-    public TileBase invalidHighlightTile;
+    public TileBase placementTile;         // The tile placed by the player (root)
+    public TileBase validHighlightTile;    // Highlight tile shown when placement is valid
+    public TileBase invalidHighlightTile;  // Highlight tile shown when placement is invalid
 
     [Header("UI Counters")]
-    public TextMeshProUGUI  totalRootText;      // UI Text reference (or TextMeshProUGUI)
-    public TextMeshProUGUI  rootLimitText;
+    public TextMeshProUGUI totalRootText;     // Displays total number of placed tiles
+    public TextMeshProUGUI rootLimitText;     // Displays max number of allowed placements
 
     [Header("Placement Settings")]
-    public Vector3Int spawnCell = Vector3Int.zero;
-    public int rootGrowthLimit = 4; // How many tiles the player can place
+    public Vector3Int spawnCell = Vector3Int.zero;  // Starting point of the root system
+    public int rootGrowthLimit = 4;                 // Max number of tiles player can grow
 
-    private int totalRootTiles = 1; // Starts with 1 (spawn tile)
-    private HashSet<Vector3Int> validPositions = new HashSet<Vector3Int>();
-    private Vector3Int lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
+    // Internal tracking variables
+    private int totalRootTiles = 1; // Starts at 1 because we place the spawn tile immediately
+    private HashSet<Vector3Int> validPositions = new HashSet<Vector3Int>(); // Positions eligible for placement
+    private Vector3Int lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue); // Tracks last placed tile to avoid drag-spam
 
     void Start()
     {
+        // Place the initial root tile and add its valid neighbors
         mainTilemap.SetTile(spawnCell, placementTile);
         AddValidNeighbors(spawnCell);
         UpdateUI();
@@ -36,28 +37,34 @@ public class GridPlacer : MonoBehaviour
 
     void Update()
     {
+        // Convert mouse position to grid cell
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cellPos = mainTilemap.WorldToCell(mouseWorldPos);
 
+        // Always clear highlight tiles before updating
         highlightTilemap.ClearAllTiles();
 
+        // Only show highlight if the cell doesn't already have a tile
         if (!mainTilemap.HasTile(cellPos))
         {
             int neighborCount = CountPlacedNeighbors(cellPos);
 
+            // Show valid highlight if position is allowed and only connects to one tile (Scrabble rule)
             if (validPositions.Contains(cellPos) && neighborCount == 1 && totalRootTiles < rootGrowthLimit + 1)
                 highlightTilemap.SetTile(cellPos, validHighlightTile);
             else
                 highlightTilemap.SetTile(cellPos, invalidHighlightTile);
         }
 
-        // Handle drag placement
+        // Handle drag placement when mouse is held down
         if (Input.GetMouseButton(0))
         {
+            // Only place if cell is different from last and is valid
             if (cellPos != lastPlacedCell && validPositions.Contains(cellPos))
             {
                 int neighborCount = CountPlacedNeighbors(cellPos);
 
+                // Allow placement only if one neighbor and still under limit
                 if (neighborCount == 1 && totalRootTiles < rootGrowthLimit + 1)
                 {
                     mainTilemap.SetTile(cellPos, placementTile);
@@ -70,12 +77,14 @@ public class GridPlacer : MonoBehaviour
             }
         }
 
+        // Reset drag placement when mouse is released
         if (Input.GetMouseButtonUp(0))
         {
             lastPlacedCell = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
         }
     }
 
+    // Adds all valid adjacent cells to a given tile (up/down/left/right)
     void AddValidNeighbors(Vector3Int origin)
     {
         Vector3Int[] directions = new Vector3Int[]
@@ -90,6 +99,7 @@ public class GridPlacer : MonoBehaviour
         {
             Vector3Int neighbor = origin + dir;
 
+            // Only add neighbors that aren't already occupied or already marked valid
             if (!mainTilemap.HasTile(neighbor) && !validPositions.Contains(neighbor))
             {
                 validPositions.Add(neighbor);
@@ -97,6 +107,7 @@ public class GridPlacer : MonoBehaviour
         }
     }
 
+    // Counts how many neighboring tiles are already placed around a given cell
     int CountPlacedNeighbors(Vector3Int cellPos)
     {
         int count = 0;
@@ -120,6 +131,7 @@ public class GridPlacer : MonoBehaviour
         return count;
     }
 
+    // Updates the UI counters for tile placement
     void UpdateUI()
     {
         if (totalRootText != null)
