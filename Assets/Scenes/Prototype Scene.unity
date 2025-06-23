@@ -4985,7 +4985,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilemap: {fileID: 1076481308}
   gridPlacer: {fileID: 1676157017}
-  nutrientTag: Nutrients
 --- !u!1 &1755496041
 GameObject:
   m_ObjectHideFlags: 0

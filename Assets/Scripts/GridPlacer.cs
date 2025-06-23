@@ -31,6 +31,9 @@ public class GridPlacer : MonoBehaviour
     public Vector3Int spawnCell = Vector3Int.zero;  // Starting point of the root system
     public int rootGrowthLimit = 4;                 // Max number of tiles player can grow
 
+    [Header("External Systems")]
+    public NutrientChecker nutrientChecker;
+
     // Internal tracking variables
     private int totalRootTiles = 1; // Starts at 1 because we place the spawn tile immediately
     private HashSet<Vector3Int> validPositions = new HashSet<Vector3Int>(); // Positions eligible for placement
@@ -84,6 +87,8 @@ public class GridPlacer : MonoBehaviour
                     lastPlacedCell = cellPos;
                     totalRootTiles++;
                     UpdateUI();
+
+                    nutrientChecker.CheckForNutrients(cellPos);
                 }
             }
         }
@@ -194,7 +199,7 @@ public class GridPlacer : MonoBehaviour
             else
             {
                 newTile = rootCorner;
-                if (right && down) rotZ = 0f;          
+                if (right && down) rotZ = 0f;
                 else if (down && left) rotZ = 270f;
                 else if (left && up) rotZ = 180f;
                 else if (up && right) rotZ = 90f;
@@ -203,7 +208,7 @@ public class GridPlacer : MonoBehaviour
         else if (connections == 3)
         {
             newTile = rootT;
-            if (!left) rotZ = 0f;             
+            if (!left) rotZ = 0f;
             else if (!up) rotZ = 270f;
             else if (!right) rotZ = 180f;
             else if (!down) rotZ = 90f;
@@ -230,4 +235,10 @@ public class GridPlacer : MonoBehaviour
         if (rootLimitText != null)
             rootLimitText.text = "Root Growth Limit: " + rootGrowthLimit;
     }
+    
+    public void ResetRoots()
+{
+    totalRootTiles = 1;
+    UpdateUI();
+}
 }
