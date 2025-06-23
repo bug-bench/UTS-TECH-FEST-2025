@@ -339,4 +339,24 @@ public class GridPlacer : MonoBehaviour
 
         UpdateUI();
     }
+
+    public void CutRootFrom(Vector3Int cutPoint)
+    {
+        int index = placedRootOrder.IndexOf(cutPoint);
+        if (index != -1)
+        {
+            // Delete cut point and all after it
+            for (int i = placedRootOrder.Count - 1; i >= index; i--)
+            {
+                Vector3Int cell = placedRootOrder[i];
+                mainTilemap.SetTile(cell, null);
+                totalRootTiles--;
+                validPositions.Add(cell);
+                AddValidNeighbors(cell);
+                placedRootOrder.RemoveAt(i);
+            }
+            UpdateUI();
+        }
+    }
+
 }
