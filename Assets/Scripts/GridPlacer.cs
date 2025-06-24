@@ -65,15 +65,18 @@ public class GridPlacer : MonoBehaviour
 
     void Start()
     {
-        rootGrowthLimit = defaultGrowthLimit;
-        mainTilemap.SetTile(spawnCell, potatoTile);
-        mainTilemap.SetTransformMatrix(spawnCell, Matrix4x4.identity);
-        AddValidNeighbors(spawnCell);
-        UpdateUI();
-        lastCheckpointPosition = spawnPoint;
+        if (TutorialManager.IsTutorialActive)
+            return;
 
-        InitializeFog();
-        RevealFog(spawnCell);
+        rootGrowthLimit = defaultGrowthLimit;
+        // mainTilemap.SetTile(spawnCell, potatoTile);
+        // mainTilemap.SetTransformMatrix(spawnCell, Matrix4x4.identity);
+        // AddValidNeighbors(spawnCell);
+        // UpdateUI();
+        // lastCheckpointPosition = spawnPoint;
+
+        // InitializeFog();
+        // RevealFog(spawnCell);
     }
 
     void Update()
@@ -163,6 +166,19 @@ public class GridPlacer : MonoBehaviour
 
             UpdateUI();
         }
+    }
+
+    public void InitializeSpawnTile()
+    {
+        mainTilemap.SetTile(spawnCell, potatoTile);
+        mainTilemap.SetTransformMatrix(spawnCell, Matrix4x4.identity);
+        AddValidNeighbors(spawnCell);
+
+        UpdateUI();
+        lastCheckpointPosition = spawnPoint;
+
+        InitializeFog();
+        RevealFog(spawnCell);
     }
 
     void AddValidNeighbors(Vector3Int origin)
