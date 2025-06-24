@@ -248,7 +248,7 @@ TextureImporter:
       name: Pantry_6
       rect:
         serializedVersion: 2
-        x: 32
+        x: 0
         y: 0
         width: 16
         height: 16
@@ -262,6 +262,28 @@ TextureImporter:
       bones: []
       spriteID: 8ff07f2379f064b61a03fc0d1b1c2b12
       internalID: 383878347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pantry_7
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2c2cd7e8a7b085d4788f97cad1d8960b
+      internalID: 1254558438
       vertices: []
       indices: 
       edges: []
@@ -287,6 +309,7 @@ TextureImporter:
       Pantry_4: -2031942324
       Pantry_5: -1356643112
       Pantry_6: 383878347
+      Pantry_7: 1254558438
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
