@@ -110,10 +110,14 @@ public class GridPlacer : MonoBehaviour
 
             if (hasCollectedCheckpoint)
             {
+                mainTilemap.ClearAllTiles();
+                totalRootTiles = 0;
+
                 foreach (var pair in checkpointTiles)
                 {
                     mainTilemap.SetTile(pair.Key, pair.Value.tile);
                     mainTilemap.SetTransformMatrix(pair.Key, pair.Value.matrix);
+                    totalRootTiles++;
                 }
 
                 currentGrowthCount = 0;
@@ -128,6 +132,9 @@ public class GridPlacer : MonoBehaviour
             }
             else
             {
+                mainTilemap.ClearAllTiles();
+                totalRootTiles = 1;
+
                 mainTilemap.SetTile(spawnCell, potatoTile);
                 mainTilemap.SetTransformMatrix(spawnCell, Matrix4x4.identity);
 
