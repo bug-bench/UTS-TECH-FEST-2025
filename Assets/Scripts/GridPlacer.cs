@@ -48,6 +48,13 @@ public class GridPlacer : MonoBehaviour
     private int checkpointRootTileCount = 1;
     private int checkpointGrowthLimit = 6;
 
+    [Header("Fog of War")]
+    public Tilemap fogTilemap;
+    public TileBase fogTile;
+    public Vector2Int fogBoundsMin = new Vector2Int(-100, -100);
+    public Vector2Int fogBoundsMax = new Vector2Int(100, 100);
+
+
     [Header("External Systems")]
     public NutrientChecker nutrientChecker;
 
@@ -64,6 +71,9 @@ public class GridPlacer : MonoBehaviour
         AddValidNeighbors(spawnCell);
         UpdateUI();
         lastCheckpointPosition = spawnPoint;
+
+        InitializeFog();
+        RevealFog(spawnCell);
     }
 
     void Update()
@@ -90,6 +100,7 @@ public class GridPlacer : MonoBehaviour
                 if (neighborCount == 1 && currentGrowthCount < rootGrowthLimit)
                 {
                     PlaceAndRefresh(cellPos);
+                    RevealFog(cellPos);
                     validPositions.Remove(cellPos);
                     AddValidNeighbors(cellPos);
                     lastPlacedCell = cellPos;
@@ -371,6 +382,33 @@ public class GridPlacer : MonoBehaviour
                 placedRootOrder.RemoveAt(i);
             }
             UpdateUI();
+        }
+    }
+    void InitializeFog()
+    {
+        for (int x = fogBoundsMin.x; x <= fogBoundsMax.x; x++)
+        {
+            for (int y = fogBoundsMin.y; y <= fogBoundsMax.y; y++)
+            {
+                Vector3Int pos = new Vector3Int(x, y, 0);
+                fogTilemap.SetTile(pos, fogTile);
+            }
+        }
+    }
+
+    void RevealFog(Vector3Int center)
+    {
+        int radius = 3; // You can change this to 4 or 5 if needed
+        for (int x = -radius; x <= radius; x++)
+        {
+            for (int y = -radius; y <= radius; y++)
+            {
+                Vector3Int tilePos = center + new Vector3Int(x, y, 0);
+                if (fogTilemap.HasTile(tilePos))
+                {
+                    fogTilemap.SetTile(tilePos, null);
+                }
+            }
         }
     }
 
