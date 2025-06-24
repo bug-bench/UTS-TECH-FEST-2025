@@ -271,7 +271,7 @@ public class GridPlacer : MonoBehaviour
             growthBarUI.SetGrowthBar(rootGrowthLimit, currentGrowthCount);
 
         if (totalRootText != null)
-            totalRootText.text = "Total Root Tiles: " + totalRootTiles;
+            totalRootText.text = "Roots grown: " + totalRootTiles;
 
         // if (rootLimitText != null)
         //     rootLimitText.text = $"Growth Used: {currentGrowthCount} / {rootGrowthLimit}";
