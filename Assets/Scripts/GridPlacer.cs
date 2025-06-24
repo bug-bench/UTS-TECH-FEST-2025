@@ -27,7 +27,9 @@ public class GridPlacer : MonoBehaviour
 
     [Header("UI Counters")]
     public TextMeshProUGUI totalRootText;
-    public TextMeshProUGUI rootLimitText;
+    // public TextMeshProUGUI rootLimitText;
+    public GrowthBarUIController growthBarUI;
+
 
     [Header("Placement Settings")]
     public Vector3Int spawnCell = Vector3Int.zero;
@@ -265,11 +267,14 @@ public class GridPlacer : MonoBehaviour
 
     void UpdateUI()
     {
-        if (totalRootText != null)
-            totalRootText.text = "Total Root Tiles: " + totalRootTiles;
+        if (growthBarUI != null)
+            growthBarUI.SetGrowthBar(rootGrowthLimit, currentGrowthCount);
 
-        if (rootLimitText != null)
-            rootLimitText.text = $"Growth Used: {currentGrowthCount} / {rootGrowthLimit}";
+        if (totalRootText != null)
+            totalRootText.text = "Roots grown: " + totalRootTiles;
+
+        // if (rootLimitText != null)
+        //     rootLimitText.text = $"Growth Used: {currentGrowthCount} / {rootGrowthLimit}";
     }
 
     public void ResetRoots()
