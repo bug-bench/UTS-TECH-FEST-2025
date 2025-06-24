@@ -129,7 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 105170141}
   - component: {fileID: 105170140}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -180,7 +180,7 @@ GameObject:
   m_Component:
   - component: {fileID: 355415446}
   - component: {fileID: 355415447}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: NutrientsManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -229,7 +229,7 @@ GameObject:
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -383,7 +383,7 @@ GameObject:
   m_Component:
   - component: {fileID: 619394802}
   - component: {fileID: 619394801}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Global Light 2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -468,7 +468,7 @@ GameObject:
   - component: {fileID: 676817129}
   - component: {fileID: 676817131}
   - component: {fileID: 676817130}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: NutriGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4736,7 +4736,7 @@ GameObject:
   - component: {fileID: 1076481306}
   - component: {fileID: 1076481308}
   - component: {fileID: 1076481307}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PlacementGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4858,7 +4858,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1114036184}
   - component: {fileID: 1114036183}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HazardManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4877,7 +4877,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff3427b730e3441bf827259a14d4cf21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hazardTile: {fileID: 0}
+  hazardTile: {fileID: 2103970408}
   hazardPrefab: {fileID: 9173526551252201321, guid: 3f95667d20e014964a0971bce6916142, type: 3}
 --- !u!4 &1114036184
 Transform:
@@ -4894,6 +4894,99 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1127198359
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1127198363}
+  - component: {fileID: 1127198362}
+  - component: {fileID: 1127198361}
+  - component: {fileID: 1127198360}
+  m_Layer: 5
+  m_Name: GrowthBarUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1127198360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127198359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eae1a91fc4cfd5e478d60074a8dd36cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  segmentPrefab: {fileID: 4956994372489195142, guid: 5e09bc81e1c4d3545b895dbaaa5a87d2, type: 3}
+  endSegmentPrefab: {fileID: 3077641762250581049, guid: fdea30609ad32b14887396d6211db0b3, type: 3}
+  barContainer: {fileID: 1127198363}
+--- !u!114 &1127198361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127198359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 0
+--- !u!114 &1127198362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127198359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 3
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
+--- !u!224 &1127198363
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127198359}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1169026574}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 400, y: -225}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1169026570
 GameObject:
   m_ObjectHideFlags: 0
@@ -4990,6 +5083,7 @@ RectTransform:
   m_Children:
   - {fileID: 932661994}
   - {fileID: 1940418374}
+  - {fileID: 1127198363}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5008,7 +5102,7 @@ GameObject:
   - component: {fileID: 1291402078}
   - component: {fileID: 1291402077}
   - component: {fileID: 1291402076}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: RatManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5115,7 +5209,7 @@ GameObject:
   - component: {fileID: 1676157019}
   - component: {fileID: 1676157020}
   - component: {fileID: 1676157021}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: GameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5146,7 +5240,7 @@ MonoBehaviour:
   rootT: {fileID: 11400000, guid: 8f80c4ab33fba461f80d40c67c0a1e8e, type: 2}
   rootCross: {fileID: 11400000, guid: a0d294aff5fb944e6b69d75ad0552738, type: 2}
   totalRootText: {fileID: 932661995}
-  rootLimitText: {fileID: 1940418375}
+  growthBarUI: {fileID: 1127198360}
   spawnCell: {x: 0, y: 0, z: 0}
   defaultGrowthLimit: 6
   rootGrowthLimit: 6
@@ -5220,7 +5314,7 @@ GameObject:
   - component: {fileID: 1755496042}
   - component: {fileID: 1755496044}
   - component: {fileID: 1755496043}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HighlightGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5367,7 +5461,7 @@ GameObject:
   - component: {fileID: 1860323575}
   - component: {fileID: 1860323577}
   - component: {fileID: 1860323576}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PathGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5726,7 +5820,7 @@ GameObject:
   - component: {fileID: 1906187080}
   - component: {fileID: 1906187082}
   - component: {fileID: 1906187081}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: WallGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6571,7 +6665,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1940418374
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6701,7 +6795,7 @@ GameObject:
   - component: {fileID: 2103970406}
   - component: {fileID: 2103970408}
   - component: {fileID: 2103970407}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HazardGrid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
