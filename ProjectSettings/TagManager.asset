@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Nutrients
   - Hazards
+  - SoilGoal
   layers:
   - Default
   - TransparentFX

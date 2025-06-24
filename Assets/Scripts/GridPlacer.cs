@@ -100,7 +100,7 @@ public class GridPlacer : MonoBehaviour
             if (cellPos != lastPlacedCell && validPositions.Contains(cellPos) && !WallChecker.Instance.IsWall(cellPos))
             {
                 int neighborCount = CountPlacedNeighbors(cellPos);
-                if (neighborCount == 1 && currentGrowthCount < rootGrowthLimit)
+                if (neighborCount == 1 && currentGrowthCount < rootGrowthLimit) 
                 {
                     PlaceAndRefresh(cellPos);
                     RevealFog(cellPos);
@@ -146,6 +146,11 @@ public class GridPlacer : MonoBehaviour
                 {
                     AddValidNeighbors(pair.Key);
                 }
+
+                    // if (SoilGoalChecker.Instance.IsGoal(cellPos))
+                    // {
+                    //     TutorialPopup.Instance.ShowMessage("You made it back to the soil.\nYou’ve completed your journey!");
+                    // }
             }
             else
             {
