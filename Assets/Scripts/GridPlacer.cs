@@ -27,14 +27,16 @@ public class GridPlacer : MonoBehaviour
 
     [Header("UI Counters")]
     public TextMeshProUGUI totalRootText;
-    // public TextMeshProUGUI rootLimitText;
     public GrowthBarUIController growthBarUI;
 
 
-    [Header("Placement Settings")]
+    [Header("Root Growth Settings")]
     public Vector3Int spawnCell = Vector3Int.zero;
     public int defaultGrowthLimit = 6;
     public int rootGrowthLimit;
+    private List<int> growthMilestones = new List<int> { 10, 20, 30, 45, 60, 75 };
+    private int nextMilestoneIndex = 0;
+    public MilestonePopupUI milestonePopup;
 
     [Header("Checkpoint")]
     public Transform playerTransform;
@@ -93,6 +95,7 @@ public class GridPlacer : MonoBehaviour
                     lastPlacedCell = cellPos;
                     totalRootTiles++;
                     currentGrowthCount++;
+                    CheckGrowthProgression();
                     placedRootOrder.Add(cellPos); // track the root
                     UpdateUI();
                     nutrientChecker.CheckForNutrients(cellPos);
@@ -371,4 +374,20 @@ public class GridPlacer : MonoBehaviour
         }
     }
 
+    void CheckGrowthProgression()
+    {
+        if (nextMilestoneIndex < growthMilestones.Count &&
+            totalRootTiles >= growthMilestones[nextMilestoneIndex])
+        {
+            rootGrowthLimit++;
+            checkpointGrowthLimit = rootGrowthLimit;
+            nextMilestoneIndex++;
+
+            if (milestonePopup != null)
+                milestonePopup.ShowPopup("+1 Growth Limit!");
+
+            UpdateUI(); // 🔁 Important!
+            Debug.Log("Milestone reached! Growth Limit increased to " + rootGrowthLimit);
+        }
+    }
 }
