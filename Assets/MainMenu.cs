@@ -5,7 +5,13 @@ public class GameMode : MonoBehaviour
 {
     public string modeName;
 
-    public void loadGameMode() {
+    public void LoadGameMode()
+    {
         SceneManager.LoadScene(modeName);
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }
